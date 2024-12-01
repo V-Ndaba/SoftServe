@@ -17,9 +17,11 @@ public partial class LevelUpDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<Graduate>(entity =>
         {
-            entity.HasKey(e => e.GraduateId).HasName("PK__Graduate__F27C3DADC8B36C53");
+            entity.HasKey(e => e.GraduateId).HasName("PK__tmp_ms_x__F27C3DAD1EFBFC0C");
 
             entity.ToTable("Graduate");
 
@@ -46,11 +48,7 @@ public partial class LevelUpDBContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("lastName");
-            entity.Property(e => e.UserName)
-                .IsRequired()
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("userName");
+            entity.Property(e => e.PhoneNumber).HasColumnName("phoneNumber");
         });
 
         OnModelCreatingPartial(modelBuilder);

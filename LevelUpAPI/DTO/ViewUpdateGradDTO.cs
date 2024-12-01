@@ -8,6 +8,7 @@ namespace LevelUpAPI.DTO
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty ;
         public string EmailAddress { get; set; } = string.Empty;
+        public int contactNumber { get; set; } = -1;
         public DateOnly DateOfBirth { get; set; } = DateOnly.MinValue;
         public int Age { get; set; } = -1;
         public DateOnly DateCreated { get; set; } = DateOnly.MinValue;
@@ -22,6 +23,7 @@ namespace LevelUpAPI.DTO
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 EmailAddress = model.EmailAddress,
+                contactNumber = model.PhoneNumber,
                 DateOfBirth = model.DateOfBirth,
                 Age = model.Age,
                 DateCreated = model.DateCreated,
@@ -38,6 +40,7 @@ namespace LevelUpAPI.DTO
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 EmailAddress = dto.EmailAddress,
+                PhoneNumber = dto.contactNumber,
                 DateOfBirth = dto.DateOfBirth,
                 Age = dto.Age,
                 DateCreated = dto.DateCreated,

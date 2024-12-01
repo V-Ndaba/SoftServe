@@ -15,6 +15,16 @@ builder.Services.AddDbContext<LevelUpDBContext>(options =>
     var connString = builder.Configuration.GetConnectionString("DatabaseConnection");
     options.UseSqlServer(connString);
 });
+//allow any origin (CORS)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,9 +35,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
+app.UseStaticFiles();
+app.UseAuthentication();
+app.UseRouting();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

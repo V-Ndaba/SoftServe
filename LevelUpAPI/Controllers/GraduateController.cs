@@ -25,7 +25,6 @@ namespace LevelUpAPI.Controllers
             //Create new GUID
             Graduate grad = ViewUpdateGradDTO.fromDTO(dto);
             grad.GraduateId = Guid.NewGuid();
-            grad.UserName = grad.FirstName + " " + grad.LastName;
             //Save to Database
             await _unitOfWork.gradRepo.AddGradAsync(grad);
             await _unitOfWork.SaveAsync();
@@ -34,7 +33,7 @@ namespace LevelUpAPI.Controllers
             return response;
         }
 
-        [HttpPost("GetAllGraduates")]
+        [HttpGet("GetAllGraduates")]
         public async Task<ActionResult<ResponseDTO>> GetAllGraduates()
         {
             //setup a fail safe
@@ -42,16 +41,21 @@ namespace LevelUpAPI.Controllers
 
             //Get ALL graduates
             List<Graduate>? graduates = await _unitOfWork.gradRepo.GetAllGradAsync();
-            if (graduates.IsNullOrEmpty())
+            if (graduates != null)
             {
                 response.StatusCode = Ok().StatusCode;
-                response.Data = graduates.Select(grad => ViewUpdateGradDTO.toDTO(grad));
+                //Only display Graduates that have not been deleted
+                response.Data = graduates
+                                        .Where(grad => grad.IsDeleted == false) 
+                                        .Select(grad => ViewUpdateGradDTO.toDTO(grad))
+                                        .ToList();
+
             }
             return response;            
         }
 
         [HttpGet("GetGraduate")]
-        public async Task<ActionResult<ResponseDTO>> GetGraduate(Guid id)
+        public async Task<ActionResult<ResponseDTO>> GetGraduate([FromQuery] Guid id)
         {
             ResponseDTO response = new ResponseDTO { StatusCode = BadRequest().StatusCode, Data = false };
 
@@ -74,7 +78,7 @@ namespace LevelUpAPI.Controllers
 
             //Create new DateEdited
             Graduate grad = ViewUpdateGradDTO.fromDTO(dto);
-            grad.DateEdited = DateOnly.MaxValue; //CURRENT DATE
+            //grad.DateEdited = DateOnly.MaxValue; //CURRENT DATE
 
             //Save to Database
             await _unitOfWork.gradRepo.UpdateGradAsync(grad);
@@ -91,10 +95,17 @@ namespace LevelUpAPI.Controllers
             ResponseDTO response = new ResponseDTO { StatusCode = BadRequest().StatusCode, Data = false };
 
             //Save to Database
-            await _unitOfWork.gradRepo.DeleteGradAsync(id);
-            await _unitOfWork.SaveAsync();
-            response.StatusCode = Ok().StatusCode;
-            response.Data = true;
+            //await _unitOfWork.gradRepo.DeleteGradAsync(id);
+            Graduate grad = await _unitOfWork.gradRepo.GetGradAsync(id);
+            if (grad != null)
+            {
+                grad.IsDeleted = true;
+                await _unitOfWork.gradRepo.UpdateGradAsync(grad);
+                await _unitOfWork.SaveAsync();
+                response.StatusCode = Ok().StatusCode;
+                response.Data = true;
+            }
+            
             return response;
         }
     }
